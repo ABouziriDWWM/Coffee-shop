@@ -10,7 +10,7 @@
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
   border: 1px solid var(--gold-accent);
-  border-radius: var(--radius-lg);
+  border-radius: 0 var(--radius-lg) 0 var(--radius-lg);
   padding: var(--spacing-lg);
   display: flex;
   align-items: center;
