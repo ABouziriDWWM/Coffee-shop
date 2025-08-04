@@ -54,8 +54,6 @@ coffee-shop/
    ```
 
 ## Documentation
-
-- [Plan d'architecture](docs/architecture_plan.md)
-- [Concept de design](docs/design_concept.md)
-
+voir 
+https://github.com/ABouziriDWWM/Coffee-shop/blob/main/architecture_plan.md
 
