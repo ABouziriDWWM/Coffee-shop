@@ -4,7 +4,7 @@
 
 class CoffeeLabApp {
   constructor() {
-    this.currentModule = 'dashboard';
+    this.currentModule = "dashboard";
     this.modules = new Map();
     this.initialized = false;
   }
@@ -15,25 +15,24 @@ class CoffeeLabApp {
     try {
       // Vérifier la santé de l'API
       await this.checkApiHealth();
-      
+
       // Initialiser les modules
       this.initializeModules();
-      
+
       // Configurer la navigation
       this.setupNavigation();
-      
+
       // Charger le module par défaut
-      await this.loadModule('dashboard');
-      
+      await this.loadModule("dashboard");
+
       // Configurer les événements globaux
       this.setupGlobalEvents();
-      
+
       this.initialized = true;
-      console.log('Coffee Lab App initialisée avec succès');
-      
+      console.log("Coffee Lab App initialisée avec succès");
     } catch (error) {
-      console.error('Erreur lors de l\'initialisation:', error);
-      notifications.error('Erreur lors de l\'initialisation de l\'application');
+      console.error("Erreur lors de l'initialisation:", error);
+      notifications.error("Erreur lors de l'initialisation de l'application");
     }
   }
 
@@ -41,51 +40,86 @@ class CoffeeLabApp {
     try {
       const response = await api.healthCheck();
       if (response.success) {
-        console.log('API Coffee Shop opérationnelle');
+        console.log("API Coffee Shop opérationnelle");
       }
     } catch (error) {
-      console.warn('API non disponible, mode hors ligne');
-      notifications.warning('API non disponible, certaines fonctionnalités peuvent être limitées');
+      console.warn("API non disponible, mode hors ligne");
+      notifications.warning(
+        "API non disponible, certaines fonctionnalités peuvent être limitées"
+      );
     }
   }
 
   initializeModules() {
     // Enregistrer les modules disponibles
-    this.modules.set('dashboard', {
-      name: 'Dashboard',
-      element: document.getElementById('dashboard-module'),
-      instance: window.DashboardModule ? new window.DashboardModule() : null
+    this.modules.set("dashboard", {
+      name: "Dashboard",
+      element: document.getElementById("dashboard-module"),
+      instance: window.DashboardModule ? new window.DashboardModule() : null,
     });
-    
-    this.modules.set('orders', {
-      name: 'Commandes',
-      element: document.getElementById('orders-module'),
-      instance: window.OrdersModule ? new window.OrdersModule() : null
+
+    this.modules.set("orders", {
+      name: "Commandes",
+      element: document.getElementById("orders-module"),
+      instance: window.OrdersModule ? new window.OrdersModule() : null,
     });
-    
-    this.modules.set('bills', {
-      name: 'Additions',
-      element: document.getElementById('bills-module'),
-      instance: window.BillsModule ? new window.BillsModule() : null
+
+    this.modules.set("bills", {
+      name: "Additions",
+      element: document.getElementById("bills-module"),
+      instance: window.BillsModule ? new window.BillsModule() : null,
     });
-    
-    this.modules.set('stock', {
-      name: 'Stock',
-      element: document.getElementById('stock-module'),
-      instance: window.StockModule ? new window.StockModule() : null
+
+    this.modules.set("stock", {
+      name: "Stock",
+      element: document.getElementById("stock-module"),
+      instance: window.StockModule ? new window.StockModule() : null,
     });
   }
 
+  // @@
+  // fix nav
   setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item[data-module]');
-    
-    navItems.forEach(item => {
-      item.addEventListener('click', async (e) => {
+    // Handle both desktop and mobile navigation
+    const allNavItems = document.querySelectorAll(
+      ".nav-item[data-module], .mobile-nav-item[data-module]"
+    );
+
+    allNavItems.forEach((item) => {
+      item.addEventListener("click", async (e) => {
         e.preventDefault();
         const moduleId = item.dataset.module;
+
+        // Update both desktop and mobile nav states
+        this.updateNavigationState(moduleId);
+
+        // Load the module
         await this.loadModule(moduleId);
+
+        // Close mobile menu if it's a mobile nav item
+        if (item.classList.contains("mobile-nav-item")) {
+          closeMobileMenu();
+        }
       });
     });
+  }
+
+  updateNavigationState(moduleId) {
+    // Remove active from all nav items
+    document.querySelectorAll(".nav-item, .mobile-nav-item").forEach((item) => {
+      item.classList.remove("active");
+    });
+
+    // Add active to corresponding items
+    const desktopItem = document.querySelector(
+      `.nav-item[data-module="${moduleId}"]`
+    );
+    const mobileItem = document.querySelector(
+      `.mobile-nav-item[data-module="${moduleId}"]`
+    );
+
+    if (desktopItem) desktopItem.classList.add("active");
+    if (mobileItem) mobileItem.classList.add("active");
   }
 
   async loadModule(moduleId) {
@@ -97,34 +131,40 @@ class CoffeeLabApp {
     try {
       // Masquer tous les modules
       this.modules.forEach((module, id) => {
-        module.element.classList.remove('active');
-        document.querySelector(`[data-module="${id}"]`).classList.remove('active');
+        module.element.classList.remove("active");
+        document
+          .querySelector(`[data-module="${id}"]`)
+          .classList.remove("active");
       });
 
       // Afficher le module sélectionné
       const module = this.modules.get(moduleId);
-      module.element.classList.add('active');
-      document.querySelector(`[data-module="${moduleId}"]`).classList.add('active');
+      module.element.classList.add("active");
+      document
+        .querySelector(`[data-module="${moduleId}"]`)
+        .classList.add("active");
 
       // Initialiser le module si nécessaire
-      if (module.instance && typeof module.instance.init === 'function') {
+      if (module.instance && typeof module.instance.init === "function") {
         await module.instance.init();
       }
 
       this.currentModule = moduleId;
-      
+
       // Mettre à jour l'URL sans recharger la page
-      history.pushState({ module: moduleId }, '', `#${moduleId}`);
-      
+      history.pushState({ module: moduleId }, "", `#${moduleId}`);
     } catch (error) {
       console.error(`Erreur lors du chargement du module ${moduleId}:`, error);
-      notifications.error(`Erreur lors du chargement du module ${this.modules.get(moduleId).name}`);
+      notifications.error(
+        `Erreur lors du chargement du module ${this.modules.get(moduleId).name}`
+      );
     }
   }
 
+  // @@
   setupGlobalEvents() {
     // Gestion du bouton retour du navigateur
-    window.addEventListener('popstate', (e) => {
+    window.addEventListener("popstate", (e) => {
       if (e.state && e.state.module) {
         this.loadModule(e.state.module);
       }
@@ -137,90 +177,105 @@ class CoffeeLabApp {
     }
 
     // Raccourcis clavier
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener("keydown", (e) => {
       // Ctrl/Cmd + K pour la recherche globale
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         this.openGlobalSearch();
       }
-      
+
       // Échap pour fermer les modales
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         modal.hide();
       }
     });
 
     // Gestion des notifications de mise à jour
     this.setupUpdateNotifications();
-    
+
     // Auto-refresh des données
     this.setupAutoRefresh();
   }
 
   openGlobalSearch() {
     // Implémentation de la recherche globale
-    modal.form('Recherche Globale', [
-      {
-        name: 'query',
-        label: 'Rechercher',
-        type: 'text',
-        required: true
-      },
-      {
-        name: 'type',
-        label: 'Type',
-        type: 'select',
-        options: [
-          { value: 'all', label: 'Tout' },
-          { value: 'orders', label: 'Commandes' },
-          { value: 'bills', label: 'Additions' },
-          { value: 'stock', label: 'Produits' }
-        ]
+    modal.form(
+      "Recherche Globale",
+      [
+        {
+          name: "query",
+          label: "Rechercher",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "type",
+          label: "Type",
+          type: "select",
+          options: [
+            { value: "all", label: "Tout" },
+            { value: "orders", label: "Commandes" },
+            { value: "bills", label: "Additions" },
+            { value: "stock", label: "Produits" },
+          ],
+        },
+      ],
+      async (data) => {
+        await this.performGlobalSearch(data.query, data.type);
+        modal.hide();
       }
-    ], async (data) => {
-      await this.performGlobalSearch(data.query, data.type);
-      modal.hide();
-    });
+    );
   }
 
   async performGlobalSearch(query, type) {
     try {
       loading.show();
-      
+
       const results = [];
-      
-      if (type === 'all' || type === 'orders') {
+
+      if (type === "all" || type === "orders") {
         const orders = await api.getOrders();
-        const filteredOrders = orders.data.filter(order => 
-          order.orderNumber.toLowerCase().includes(query.toLowerCase()) ||
-          order.customerName.toLowerCase().includes(query.toLowerCase())
+        const filteredOrders = orders.data.filter(
+          (order) =>
+            order.orderNumber.toLowerCase().includes(query.toLowerCase()) ||
+            order.customerName.toLowerCase().includes(query.toLowerCase())
         );
-        results.push(...filteredOrders.map(order => ({ ...order, type: 'order' })));
+        results.push(
+          ...filteredOrders.map((order) => ({ ...order, type: "order" }))
+        );
       }
-      
-      if (type === 'all' || type === 'bills') {
+
+      if (type === "all" || type === "bills") {
         const bills = await api.getBills();
-        const filteredBills = bills.data.filter(bill => 
-          bill.billNumber.toLowerCase().includes(query.toLowerCase()) ||
-          bill.customerName.toLowerCase().includes(query.toLowerCase())
+        const filteredBills = bills.data.filter(
+          (bill) =>
+            bill.billNumber.toLowerCase().includes(query.toLowerCase()) ||
+            bill.customerName.toLowerCase().includes(query.toLowerCase())
         );
-        results.push(...filteredBills.map(bill => ({ ...bill, type: 'bill' })));
+        results.push(
+          ...filteredBills.map((bill) => ({ ...bill, type: "bill" }))
+        );
       }
-      
-      if (type === 'all' || type === 'stock') {
+
+      if (type === "all" || type === "stock") {
         const products = await api.getProducts();
-        const filteredProducts = products.data.filter(product => 
-          product.productName.toLowerCase().includes(query.toLowerCase()) ||
-          product.productId.toLowerCase().includes(query.toLowerCase())
+        const filteredProducts = products.data.filter(
+          (product) =>
+            product.productName.toLowerCase().includes(query.toLowerCase()) ||
+            product.productId.toLowerCase().includes(query.toLowerCase())
         );
-        results.push(...filteredProducts.map(product => ({ ...product, type: 'product' })));
+        results.push(
+          ...filteredProducts.map((product) => ({
+            ...product,
+            type: "product",
+          }))
+        );
       }
-      
+
       this.displaySearchResults(results, query);
-      
     } catch (error) {
-      console.error('Erreur lors de la recherche:', error);
-      notifications.error('Erreur lors de la recherche');
+      console.error("Erreur lors de la recherche:", error);
+      notifications.error("Erreur lors de la recherche");
     } finally {
       loading.hide();
     }
@@ -235,38 +290,43 @@ class CoffeeLabApp {
         </button>
       </div>
       <div class="modal-body">
-        ${results.length === 0 ? 
-          '<p class="text-center text-muted">Aucun résultat trouvé</p>' :
-          results.map(result => this.renderSearchResult(result)).join('')
+        ${
+          results.length === 0
+            ? '<p class="text-center text-muted">Aucun résultat trouvé</p>'
+            : results.map((result) => this.renderSearchResult(result)).join("")
         }
       </div>
     `;
-    
+
     modal.show(content);
   }
 
   renderSearchResult(result) {
     const typeLabels = {
-      order: 'Commande',
-      bill: 'Addition',
-      product: 'Produit'
+      order: "Commande",
+      bill: "Addition",
+      product: "Produit",
     };
-    
+
     const typeIcons = {
-      order: 'fas fa-shopping-cart',
-      bill: 'fas fa-receipt',
-      product: 'fas fa-box'
+      order: "fas fa-shopping-cart",
+      bill: "fas fa-receipt",
+      product: "fas fa-box",
     };
-    
+
     return `
-      <div class="search-result" onclick="app.openSearchResult('${result.type}', '${result._id}')">
+      <div class="search-result" onclick="app.openSearchResult('${
+        result.type
+      }', '${result._id}')">
         <div class="search-result-header">
           <i class="${typeIcons[result.type]}"></i>
           <span class="search-result-type">${typeLabels[result.type]}</span>
         </div>
         <div class="search-result-content">
-          <h4>${result.orderNumber || result.billNumber || result.productName}</h4>
-          <p>${result.customerName || result.category || ''}</p>
+          <h4>${
+            result.orderNumber || result.billNumber || result.productName
+          }</h4>
+          <p>${result.customerName || result.category || ""}</p>
         </div>
       </div>
     `;
@@ -274,20 +334,20 @@ class CoffeeLabApp {
 
   async openSearchResult(type, id) {
     modal.hide();
-    
+
     const moduleMap = {
-      order: 'orders',
-      bill: 'bills',
-      product: 'stock'
+      order: "orders",
+      bill: "bills",
+      product: "stock",
     };
-    
+
     const moduleId = moduleMap[type];
     if (moduleId) {
       await this.loadModule(moduleId);
-      
+
       // Notifier le module pour qu'il affiche l'élément spécifique
       const module = this.modules.get(moduleId);
-      if (module.instance && typeof module.instance.showItem === 'function') {
+      if (module.instance && typeof module.instance.showItem === "function") {
         module.instance.showItem(id);
       }
     }
@@ -299,11 +359,17 @@ class CoffeeLabApp {
       try {
         // Vérifier s'il y a de nouvelles commandes
         const currentModule = this.modules.get(this.currentModule);
-        if (currentModule.instance && typeof currentModule.instance.checkUpdates === 'function') {
+        if (
+          currentModule.instance &&
+          typeof currentModule.instance.checkUpdates === "function"
+        ) {
           await currentModule.instance.checkUpdates();
         }
       } catch (error) {
-        console.error('Erreur lors de la vérification des mises à jour:', error);
+        console.error(
+          "Erreur lors de la vérification des mises à jour:",
+          error
+        );
       }
     }, 30000); // Toutes les 30 secondes
   }
@@ -311,9 +377,12 @@ class CoffeeLabApp {
   setupAutoRefresh() {
     // Auto-refresh des données toutes les 5 minutes
     setInterval(async () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         const currentModule = this.modules.get(this.currentModule);
-        if (currentModule.instance && typeof currentModule.instance.refresh === 'function') {
+        if (
+          currentModule.instance &&
+          typeof currentModule.instance.refresh === "function"
+        ) {
           await currentModule.instance.refresh();
         }
       }
@@ -331,7 +400,10 @@ class CoffeeLabApp {
 
   async refreshCurrentModule() {
     const currentModule = this.modules.get(this.currentModule);
-    if (currentModule.instance && typeof currentModule.instance.refresh === 'function') {
+    if (
+      currentModule.instance &&
+      typeof currentModule.instance.refresh === "function"
+    ) {
       await currentModule.instance.refresh();
     }
   }
@@ -341,11 +413,11 @@ class CoffeeLabApp {
 const app = new CoffeeLabApp();
 
 // Démarrer l'application quand le DOM est prêt
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   try {
     await app.init();
   } catch (error) {
-    console.error('Erreur fatale lors de l\'initialisation:', error);
+    console.error("Erreur fatale lors de l'initialisation:", error);
     document.body.innerHTML = `
       <div class="error-container">
         <h1>Erreur d'initialisation</h1>
@@ -356,6 +428,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// @@ menu burger
+
+const burgerMenu = document.querySelector(".burger-menu");
+const mobileNav = document.querySelector(".mobile-nav");
+const mobileOverlay = document.querySelector(".mobile-overlay");
+const mobileNavItems = document.querySelectorAll(".mobile-nav-item");
+const desktopNavItems = document.querySelectorAll(".nav-item");
+
+// Toggle mobile menu
+function toggleMobileMenu() {
+  burgerMenu.classList.toggle("active");
+  mobileNav.classList.toggle("active");
+  mobileOverlay.classList.toggle("active");
+  document.body.style.overflow = mobileNav.classList.contains("active")
+    ? "hidden"
+    : "";
+}
+
+// Close mobile menu
+function closeMobileMenu() {
+  burgerMenu.classList.remove("active");
+  mobileNav.classList.remove("active");
+  mobileOverlay.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+// Event listeners
+burgerMenu.addEventListener("click", toggleMobileMenu);
+mobileOverlay.addEventListener("click", closeMobileMenu);
+
+// Handle mobile nav item clicks
+mobileNavItems.forEach((item) => {
+  item.addEventListener("click", (e) => {
+    const module = e.currentTarget.dataset.module;
+
+    // Remove active class from all mobile nav items
+    mobileNavItems.forEach((navItem) => navItem.classList.remove("active"));
+    // Add active class to clicked item
+    e.currentTarget.classList.add("active");
+
+    // Sync with desktop navigation if needed
+    desktopNavItems.forEach((navItem) => navItem.classList.remove("active"));
+    const correspondingDesktopItem = document.querySelector(
+      `.nav-item[data-module="${module}"]`
+    );
+    if (correspondingDesktopItem) {
+      correspondingDesktopItem.classList.add("active");
+    }
+
+    // Close mobile menu after selection
+    closeMobileMenu();
+
+    // Trigger your existing module switching logic here
+    // For example: showModule(module);
+  });
+});
+
+// Close menu on escape key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && mobileNav.classList.contains("active")) {
+    closeMobileMenu();
+  }
+});
+
 // Export pour utilisation globale
 window.app = app;
-
