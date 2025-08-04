@@ -1,6 +1,6 @@
-# Coffee Shop CRUD - Site Web Futuriste
+# Coffee Shop CRUD - Site Web
 
-Site web CRUD modularisé et responsive pour un coffee shop avec un style inhabituel "Coffee Lab Futuriste", utilisant HTML, CSS, JavaScript et MongoDB.
+Site web CRUD modularisé et responsive pour un coffee shop , utilisant HTML, CSS, JavaScript, python et MongoDB.
 
 ## Fonctionnalités
 
@@ -16,9 +16,9 @@ Site web CRUD modularisé et responsive pour un coffee shop avec un style inhabi
 - **Backend** : Flask (Python)
 - **Base de données** : MongoDB
 - **Frontend** : HTML5, CSS3, JavaScript (Vanilla)
-- **Style** : Néomorphisme, Glassmorphisme, animations CSS
 
-## Structure du projet
+
+## Structure du projet finale
 
 ```
 coffee-shop/
@@ -58,7 +58,4 @@ coffee-shop/
 - [Plan d'architecture](docs/architecture_plan.md)
 - [Concept de design](docs/design_concept.md)
 
-## Auteur
-
-Développé par Manus AI
 
