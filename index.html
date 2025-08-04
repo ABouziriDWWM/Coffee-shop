@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Lab - Gestion Futuriste</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/modules.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation principale -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <i class="fas fa-coffee"></i>
+                </div>
+                <h1 class="brand-title">Coffee Lab</h1>
+            </div>
+
+            <div class="nav-menu">
+                <button class="nav-item active" data-module="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-module="orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Commandes</span>
+                </button>
+                <button class="nav-item" data-module="bills">
+                    <i class="fas fa-receipt"></i>
+                    <span>Additions</span>
+                </button>
+                <button class="nav-item" data-module="stock">
+                    <i class="fas fa-boxes"></i>
+                    <span>Stock</span>
+                </button>
+            </div>
+
+            <div class="nav-actions">
+                <button class="action-btn notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <button class="action-btn profile-btn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+        <!-- Module Dashboard -->
+        <section id="dashboard-module" class="module active">
+            <div class="module-header">
+                <h2 class="module-title">
+                    <i class="fas fa-chart-line"></i>
+                    Tableau de Bord
+                </h2>
+                <div class="module-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualiser
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Cartes de statistiques -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon orders">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="total-orders">0</h3>
+                            <p class="stat-label">Commandes Actives</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="total-revenue">0€</h3>
+                            <p class="stat-label">Chiffre d'Affaires</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon stock">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="low-stock-count">0</h3>
+                            <p class="stat-label">Alertes Stock</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon bills">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="pending-bills">0</h3>
+                            <p class="stat-label">Additions en Attente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graphiques et listes -->
+                <div class="dashboard-panels">
+                    <div class="panel recent-orders">
+                        <h3 class="panel-title">Commandes Récentes</h3>
+                        <div class="panel-content">
+                            <div id="recent-orders-list" class="orders-list">
+                                <!-- Contenu dynamique -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel stock-alerts">
+                        <h3 class="panel-title">Alertes Stock</h3>
+                        <div class="panel-content">
+                            <div id="stock-alerts-list" class="alerts-list">
+                                <!-- Contenu dynamique -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module Commandes -->
+        <section id="orders-module" class="module">
+            <div class="module-header">
+                <h2 class="module-title">
+                    <i class="fas fa-shopping-cart"></i>
+                    Gestion des Commandes
+                </h2>
+                <div class="module-actions">
+                    <button class="btn btn-primary" id="new-order-btn">
+                        <i class="fas fa-plus"></i>
+                        Nouvelle Commande
+                    </button>
+                </div>
+            </div>
+
+            <div class="module-content">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="order-status-filter">Statut:</label>
+                        <select id="order-status-filter" class="filter-select">
+                            <option value="">Tous</option>
+                            <option value="pending">En Attente</option>
+                            <option value="preparing">En Préparation</option>
+                            <option value="ready">Prête</option>
+                            <option value="completed">Terminée</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="order-search" class="search-input"
+                            placeholder="Rechercher une commande...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div id="orders-list" class="data-list">
+                    <!-- Contenu dynamique -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Module Additions -->
+        <section id="bills-module" class="module">
+            <div class="module-header">
+                <h2 class="module-title">
+                    <i class="fas fa-receipt"></i>
+                    Gestion des Additions
+                </h2>
+                <div class="module-actions">
+                    <button class="btn btn-secondary" id="bills-stats-btn">
+                        <i class="fas fa-chart-bar"></i>
+                        Statistiques
+                    </button>
+                </div>
+            </div>
+
+            <div class="module-content">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="bill-status-filter">Statut de Paiement:</label>
+                        <select id="bill-status-filter" class="filter-select">
+                            <option value="">Tous</option>
+                            <option value="pending">En Attente</option>
+                            <option value="paid">Payé</option>
+                            <option value="refunded">Remboursé</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="bill-search" class="search-input"
+                            placeholder="Rechercher une addition...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div id="bills-list" class="data-list">
+                    <!-- Contenu dynamique -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Module Stock -->
+        <section id="stock-module" class="module">
+            <div class="module-header">
+                <h2 class="module-title">
+                    <i class="fas fa-boxes"></i>
+                    Gestion du Stock
+                </h2>
+                <div class="module-actions">
+                    <button class="btn btn-primary" id="new-product-btn">
+                        <i class="fas fa-plus"></i>
+                        Nouveau Produit
+                    </button>
+                </div>
+            </div>
+
+            <div class="module-content">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="stock-category-filter">Catégorie:</label>
+                        <select id="stock-category-filter" class="filter-select">
+                            <option value="">Toutes</option>
+                            <option value="coffee">Café</option>
+                            <option value="pastry">Pâtisserie</option>
+                            <option value="equipment">Équipement</option>
+                            <option value="supplies">Fournitures</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="stock-status-filter">Statut:</label>
+                        <select id="stock-status-filter" class="filter-select">
+                            <option value="">Tous</option>
+                            <option value="available">Disponible</option>
+                            <option value="low_stock">Stock Faible</option>
+                            <option value="out_of_stock">Rupture</option>
+                            <option value="expired">Expiré</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="stock-search" class="search-input"
+                            placeholder="Rechercher un produit...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div id="stock-list" class="data-list">
+                    <!-- Contenu dynamique -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modales -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="modal-container" class="modal-container">
+            <!-- Contenu dynamique des modales -->
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notifications-container" class="notifications-container">
+        <!-- Notifications dynamiques -->
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/orders.js"></script>
+    <script src="js/modules/bills.js"></script>
+    <script src="js/modules/stock.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
