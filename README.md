@@ -1,7 +1,7 @@
 # Coffee Shop CRUD - Site Web
 
 Site web CRUD modularisé et responsive pour un coffee shop , utilisant HTML, CSS, JavaScript, python et MongoDB.
-
+(projet non réussi)
 ## Fonctionnalités
 
 - **Gestion des commandes** : Création, modification et suivi des commandes
